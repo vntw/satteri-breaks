@@ -1,3 +1,4 @@
+import type { PhrasingContent } from 'mdast';
 import { defineMdastPlugin } from 'satteri';
 
 const lineEndingPattern = /\r\n?|\n/;
@@ -13,31 +14,19 @@ export const satteriBreaks = defineMdastPlugin({
   text(node, ctx) {
     if (!lineEndingPattern.test(node.value)) return;
 
-    const parent = ctx.parent(node);
-    if (!parent || !('children' in parent)) return;
+    const children: PhrasingContent[] = [];
 
-    const children: any[] = [];
-
-    for (const child of parent.children) {
-      if (child.type !== 'text' || !lineEndingPattern.test((child as any).value)) {
-        children.push(child);
-        continue;
+    for (const [index, value] of node.value.split(lineEndingPattern).entries()) {
+      if (index > 0) {
+        children.push({ type: 'break' });
       }
 
-      const parts = (child as any).value.split(lineEndingPattern);
-
-      for (const [index, value] of parts.entries()) {
-        if (index > 0) {
-          children.push({ type: 'break' });
-        }
-
-        if (value) {
-          children.push({ type: 'text', value });
-        }
+      if (value) {
+        children.push({ type: 'text', value });
       }
     }
 
-    ctx.setProperty(parent, 'children', children);
+    ctx.replaceNode(node, children);
   },
 });
 

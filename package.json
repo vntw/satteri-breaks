@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "mdast": "^3.0.0",
     "satteri": "^0.10.5",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
